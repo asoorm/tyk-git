@@ -3,6 +3,7 @@ package gateway
 import (
 	"errors"
 	"fmt"
+	"github.com/TykTechnologies/tyk-sync/clients/objects"
 	"github.com/TykTechnologies/tyk/apidef"
 	"github.com/levigross/grequests"
 	"github.com/ongoingio/urljoin"
@@ -10,12 +11,14 @@ import (
 )
 
 type Client struct {
-	url    string
-	secret string
+	url                string
+	secret             string
+	InsecureSkipVerify bool
 }
 
 const (
 	endpointAPIs     string = "/tyk/apis/"
+	endpointCerts    string = "/tyk/certs"
 	reloadAPIs       string = "/tyk/reload/group"
 	endpointPolicies string = "/tyk/policies"
 )
@@ -41,6 +44,47 @@ func NewGatewayClient(url, secret string) (*Client, error) {
 	}, nil
 }
 
+func (c *Client) SetInsecureTLS(val bool) {
+	c.InsecureSkipVerify = val
+}
+
+func (c *Client) GetActiveID(def *apidef.APIDefinition) string {
+	return def.APIID
+}
+
+func (c *Client) FetchAPIs() ([]objects.DBApiDefinition, error) {
+	fullPath := urljoin.Join(c.url, endpointAPIs)
+
+	ro := &grequests.RequestOptions{
+		Headers: map[string]string{
+			"x-tyk-authorization": c.secret,
+			"content-type":        "application/json",
+		},
+		InsecureSkipVerify: c.InsecureSkipVerify,
+	}
+
+	resp, err := grequests.Get(fullPath, ro)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != 200 {
+		return nil, fmt.Errorf("API Returned error: %v", resp.String())
+	}
+
+	apis := APISList{}
+	if err := resp.JSON(&apis); err != nil {
+		return nil, err
+	}
+
+	retList := make([]objects.DBApiDefinition, len(apis))
+	for i, api := range apis {
+		retList[i] = objects.DBApiDefinition{APIDefinition: api}
+	}
+
+	return retList, nil
+}
+
 func (c *Client) CreateAPI(def *apidef.APIDefinition) (string, error) {
 	fullPath := urljoin.Join(c.url, endpointAPIs)
 
@@ -49,6 +93,7 @@ func (c *Client) CreateAPI(def *apidef.APIDefinition) (string, error) {
 			"x-tyk-authorization": c.secret,
 			"content-type":        "application/json",
 		},
+		InsecureSkipVerify: c.InsecureSkipVerify,
 	}
 
 	resp, err := grequests.Get(fullPath, ro)
@@ -82,6 +127,7 @@ func (c *Client) CreateAPI(def *apidef.APIDefinition) (string, error) {
 			"x-tyk-authorization": c.secret,
 			"content-type":        "application/json",
 		},
+		InsecureSkipVerify: c.InsecureSkipVerify,
 	})
 
 	if err != nil {
@@ -101,6 +147,9 @@ func (c *Client) CreateAPI(def *apidef.APIDefinition) (string, error) {
 		return "", fmt.Errorf("API request completed, but with error: %v", status.Message)
 	}
 
+	// initiate a reload
+	go c.Reload()
+
 	return status.Key, nil
 }
 
@@ -112,6 +161,7 @@ func (c *Client) Reload() error {
 		Headers: map[string]string{
 			"x-tyk-authorization": c.secret,
 		},
+		InsecureSkipVerify: c.InsecureSkipVerify,
 	})
 
 	if err != nil {
@@ -142,6 +192,7 @@ func (c *Client) UpdateAPI(def *apidef.APIDefinition) error {
 			"x-tyk-authorization": c.secret,
 			"content-type":        "application/json",
 		},
+		InsecureSkipVerify: c.InsecureSkipVerify,
 	}
 
 	resp, err := grequests.Get(fullPath, ro)
@@ -181,6 +232,7 @@ func (c *Client) UpdateAPI(def *apidef.APIDefinition) error {
 			"x-tyk-authorization": c.secret,
 			"content-type":        "application/json",
 		},
+		InsecureSkipVerify: c.InsecureSkipVerify,
 	})
 
 	if err != nil {
@@ -190,6 +242,9 @@ func (c *Client) UpdateAPI(def *apidef.APIDefinition) error {
 	if uResp.StatusCode != 200 {
 		return fmt.Errorf("API Returned error: %v (code: %v)", uResp.String(), uResp.StatusCode)
 	}
+
+	// initiate a reload
+	go c.Reload()
 
 	return nil
 }
@@ -206,6 +261,7 @@ func (c *Client) Sync(apiDefs []apidef.APIDefinition) error {
 			"x-tyk-authorization": c.secret,
 			"content-type":        "application/json",
 		},
+		InsecureSkipVerify: c.InsecureSkipVerify,
 	}
 
 	resp, err := grequests.Get(fullPath, ro)
@@ -299,6 +355,10 @@ func (c *Client) Sync(apiDefs []apidef.APIDefinition) error {
 	return nil
 }
 
+func (c *Client) DeleteAPI(id string) error {
+	return c.deleteAPI(id)
+}
+
 func (c *Client) deleteAPI(id string) error {
 	delPath := urljoin.Join(c.url, endpointAPIs)
 	delPath += id
@@ -308,6 +368,7 @@ func (c *Client) deleteAPI(id string) error {
 			"x-tyk-authorization": c.secret,
 			"content-type":        "application/json",
 		},
+		InsecureSkipVerify: c.InsecureSkipVerify,
 	})
 
 	if err != nil {
@@ -317,6 +378,9 @@ func (c *Client) deleteAPI(id string) error {
 	if delResp.StatusCode != 200 {
 		return fmt.Errorf("API Returned error: %v", delResp.String())
 	}
+
+	// initiate a reload
+	go c.Reload()
 
 	return nil
 }

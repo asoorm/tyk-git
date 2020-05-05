@@ -48,7 +48,10 @@ const Schema = `{
         "openid_options": {
             "type": ["object", "null"]
         },
-        "use_standard_auth":{
+        "use_standard_auth": {
+            "type": "boolean"
+        },
+        "use_go_plugin_auth": {
             "type": "boolean"
         },
         "enable_coprocess_auth": {
@@ -71,6 +74,9 @@ const Schema = `{
         },
         "jwt_policy_field_name": {
             "type": "string"
+        },
+        "jwt_default_policies": {
+            "type": ["array", "null"]
         },
         "jwt_signing_method": {
             "type": "string"
@@ -214,12 +220,17 @@ const Schema = `{
         "session_lifetime": {
             "type": "number"
         },
+        "enable_detailed_recording": {
+            "type": "boolean"
+        },
         "enable_signature_checking": {
             "type": "boolean"
         },
         "active": {
-            "type": "boolean",
-            "id": "http://jsonschema.net/active"
+            "type": "boolean"
+        },
+        "internal": {
+            "type": "boolean"
         },
         "auth": {
             "type": ["object", "null"],
@@ -232,11 +243,11 @@ const Schema = `{
                 "use_certificate": {
                     "type": "boolean"
                 }
-            },
-            "required": [
-                "auth_header_name"
-            ]
+            }
         },
+		"auth_configs":{
+			"type": ["object", "null"]
+		},
         "definition": {
             "type": ["object", "null"],
             "id": "http://jsonschema.net/definition",
@@ -271,6 +282,15 @@ const Schema = `{
         "domain": {
             "type": "string"
         },
+        "listen_port": {
+            "type": "number"
+        },
+        "protocol": {
+            "type": "string"
+        },
+        "enable_proxy_protocol": {
+            "type": "boolean"
+        },
         "certificates": {
             "type": ["array", "null"]
         },
@@ -302,6 +322,9 @@ const Schema = `{
                         },
                         "proxy_url": {
                             "type": "string"
+                        },
+                        "ssl_force_common_name_check": {
+                            "type": "boolean"
                         }
                     }
                 }
@@ -386,6 +409,26 @@ const Schema = `{
                     "type": "number"
                 }
             }
+        },
+    "request_signing": {
+          "type": ["object", "null"],
+           "properties": {
+                "is_enabled": {
+                    "type": "boolean"
+                },
+                "secret": {
+                    "type": "string"
+                },
+        "key_id": {
+                    "type": "string"
+                },
+        "algorithm": {
+                    "type": "string"
+                }
+            },
+        "required": [
+            "is_enabled"
+        ]
         }
     },
     "required": [

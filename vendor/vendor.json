@@ -16,16 +16,28 @@
 			"revisionTime": "2017-02-22T15:40:38Z"
 		},
 		{
-			"checksumSHA1": "8isFGBofxsaVf2VK3YZUrdzkOAU=",
+			"checksumSHA1": "/2vXakLC7rNt1Jy9AiU5OSfb5jI=",
 			"path": "github.com/TykTechnologies/tyk/apidef",
-			"revision": "288924abc78d9eb92c9be247951ec337f67afe74",
-			"revisionTime": "2019-01-28T15:15:05Z"
+			"revision": "c6a604eb68b8c8ddb48f91febb761ec79c60e11d",
+			"revisionTime": "2020-04-29T11:31:13Z"
 		},
 		{
 			"checksumSHA1": "1Psesm1j6+rBb8G0DM7gzfs50g8=",
 			"path": "github.com/TykTechnologies/tyk/log",
 			"revision": "f2c2b7b6b821804a877e3f4f02502ae9b3d60e3a",
 			"revisionTime": "2017-07-26T18:22:33Z"
+		},
+		{
+			"checksumSHA1": "T7EyNMpVM5MbpdnOErb9wBwKxsU=",
+			"path": "github.com/TykTechnologies/tyk/regexp",
+			"revision": "c6a604eb68b8c8ddb48f91febb761ec79c60e11d",
+			"revisionTime": "2020-04-29T11:31:13Z"
+		},
+		{
+			"checksumSHA1": "/Y2VdTgRYTCfuvy1wAMSMsePieQ=",
+			"path": "github.com/clbanning/mxj",
+			"revision": "27bf4088b98b518a041b9a12dc22f59dfff69027",
+			"revisionTime": "2020-05-01T15:19:32Z"
 		},
 		{
 			"checksumSHA1": "n25vuAkZbpXDMGrutoefN+b4g+M=",
@@ -92,6 +104,12 @@
 			"path": "github.com/ongoingio/urljoin",
 			"revision": "8d88f7c81c3c24357c650e35eb1d0e3541193cd7",
 			"revisionTime": "2014-09-09T07:10:54Z"
+		},
+		{
+			"checksumSHA1": "SH1PJKKZk9M7XNUlZynKwR2VRzs=",
+			"path": "github.com/pmylund/go-cache",
+			"revision": "46f407853014144407b6c2ec7ccc76bf67958d93",
+			"revisionTime": "2019-10-04T19:21:08Z"
 		},
 		{
 			"checksumSHA1": "zmC8/3V4ls53DJlNTKDZwPSC/dA=",
@@ -510,5 +528,5 @@
 			"revisionTime": "2016-08-15T18:11:09Z"
 		}
 	],
-	"rootPath": "github.com/TykTechnologies/tyk-git"
+	"rootPath": "github.com/TykTechnologies/tyk-sync"
 }
